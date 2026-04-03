@@ -1,0 +1,46 @@
+{% extends "absence/base.html" %}
+{% block title %}Liste des séances{% endblock %}
+{% block page_heading %}Séances planifiées{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+<a href="{% url 'gestion_seance_nouvelle' %}{% if filtre_cours_id %}?cours={{ filtre_cours_id }}{% endif %}" class="btn btn-primary btn-sm">+ Nouvelle séance</a>
+{% endblock %}
+
+{% block content %}
+<form method="get" class="stack-form" style="max-width: 360px; margin-bottom: 1rem;">
+    <label for="filtre-cours">Filtrer par cours</label>
+    <select name="cours" id="filtre-cours" class="input" onchange="this.form.submit()">
+        <option value="">— Tous —</option>
+        {% for c in cours_list %}
+        <option value="{{ c.pk }}" {% if filtre_cours_id == c.pk|stringformat:"d" %}selected{% endif %}>{{ c.code_cours }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Cours</th>
+                <th>Année</th>
+                <th>Créneau</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in seances %}
+            <tr>
+                <td>{{ s.date_seance|date:"d/m/Y" }}</td>
+                <td><strong>{{ s.id_cours.code_cours }}</strong></td>
+                <td>{{ s.id_annee.libelle }}</td>
+                <td>{{ s.heure_debut }} – {{ s.heure_fin }} h</td>
+                <td>{{ s.get_statut_seance_display }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-muted">Aucune séance. <a href="{% url 'gestion_seance_nouvelle' %}">En ajouter une</a>.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

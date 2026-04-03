@@ -1,0 +1,15 @@
+{% extends "absence/base.html" %}
+{% block title %}Nouvelle séance{% endblock %}
+{% block page_heading %}Ajouter une séance{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_seances_liste' %}" class="btn btn-secondary btn-sm">← Liste des séances</a>
+{% endblock %}
+
+{% block content %}
+<p class="small text-muted">Une séance = un cours + une année + une date + un créneau horaire. Le prof choisit la séance lorsqu’il déclare une absence (pas deux absences sur la même séance pour le même étudiant).</p>
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enregistrer la séance</button>
+</form>
+{% endblock %}

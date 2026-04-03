@@ -1,0 +1,47 @@
+{% extends "absence/base.html" %}
+{% block title %}Inscriptions aux cours{% endblock %}
+{% block page_heading %}Qui est inscrit à quel cours ?{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+{% endblock %}
+
+{% block content %}
+<div class="card card-muted" style="margin-bottom: 1.25rem;">
+    <p class="small"><strong>Pourquoi le prof ne voit qu’un étudiant ?</strong> La liste « Étudiant » lors d’une absence correspond aux lignes de ce tableau : une ligne = un étudiant <strong>inscrit</strong> à un cours pour une année. Chaque nouvel étudiant doit avoir sa propre <a href="{% url 'gestion_inscription_nouvelle' %}">inscription</a> (même cours BD501, même année que celle du prof).</p>
+</div>
+
+<form method="get" class="stack-form" style="max-width: 360px; margin-bottom: 1rem;">
+    <label for="filtre-cours">Filtrer par cours</label>
+    <select name="cours" id="filtre-cours" class="input" onchange="this.form.submit()">
+        <option value="">— Tous les cours —</option>
+        {% for c in cours_list %}
+        <option value="{{ c.pk }}" {% if filtre_cours_id == c.pk|stringformat:"d" %}selected{% endif %}>{{ c.code_cours }} — {{ c.intitule|truncatechars:40 }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cours</th>
+                <th>Année</th>
+                <th>Étudiant</th>
+                <th>Matricule</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in inscriptions %}
+            <tr>
+                <td><strong>{{ i.id_cours.code_cours }}</strong></td>
+                <td>{{ i.id_annee.libelle }}</td>
+                <td>{{ i.id_etudiant.prenom }} {{ i.id_etudiant.nom }}</td>
+                <td>{{ i.id_etudiant.matricule }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted">Aucune inscription validée. Ajoutez-en via <a href="{% url 'gestion_inscription_nouvelle' %}">Inscription au cours</a>.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

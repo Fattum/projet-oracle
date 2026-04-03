@@ -1,0 +1,42 @@
+{% extends "absence/base.html" %}
+{% load humanize %}
+{% block title %}Synthèse absences{% endblock %}
+{% block page_heading %}Synthèse — absences non justifiées{% endblock %}
+
+{% block content %}
+{% if not erreur %}
+<p class="small text-muted" style="margin-bottom: 1rem;">
+    Pour changer le statut « justifié » ou le texte du motif, allez dans
+    <a href="{% url 'scolarite_absences_a_traiter' %}">Traiter absences</a>.
+</p>
+{% endif %}
+{% if erreur == 'no_annee' %}
+<p class="text-muted">Définissez une année universitaire en base.</p>
+{% elif erreur == 'tables_metier' %}
+<div class="alert alert-warn">Tables métier indisponibles.</div>
+{% elif stats %}
+<p class="text-muted small">Top étudiants par nombre d’absences <strong>non justifiées</strong> — {{ annee.libelle }}</p>
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Étudiant</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in stats %}
+            <tr>
+                <td>{{ row.id_inscription__id_etudiant__matricule }}</td>
+                <td>{{ row.id_inscription__id_etudiant__prenom }} {{ row.id_inscription__id_etudiant__nom }}</td>
+                <td><strong>{{ row.nb|intcomma }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">Pas de statistiques à afficher.</p>
+{% endif %}
+{% endblock %}

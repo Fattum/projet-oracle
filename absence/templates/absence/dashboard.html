@@ -1,0 +1,80 @@
+{% extends "absence/base.html" %}
+{% block title %}Accueil{% endblock %}
+{% block page_heading %}Accueil{% endblock %}
+{% block header_meta %}
+<span class="chip {% if oracle_actif %}chip-ok{% else %}chip-muted{% endif %}">
+    Base de données : {% if oracle_actif %}Oracle{% else %}SQLite (mode test){% endif %}
+</span>
+{% endblock %}
+
+{% block content %}
+{% if not has_any_app_role %}
+<div class="alert alert-warn">
+    <strong>Votre compte n’a pas de rôle.</strong> Demandez à un responsable de vous ajouter à un groupe
+    (Étudiant, Enseignant, Scolarité ou Admin), ou utilisez un compte de démo après <code>seed_demo</code>.
+</div>
+{% endif %}
+
+<p class="lead">
+    Bienvenue sur l’application de <strong>gestion des absences</strong>.
+    {% if annee %}Année affichée : <strong>{{ annee.libelle }}</strong>.{% endif %}
+</p>
+<p class="text-muted small">
+    Choisissez une action ci-dessous selon votre profil (menu à gauche sur ordinateur, bouton menu sur téléphone).
+</p>
+
+{% if alertes_seuil %}
+<div class="alert alert-warn" style="margin-bottom:1.25rem;">
+    <strong>Seuil d’absences non justifiées atteint</strong>
+    <p class="small" style="margin:0.35rem 0 0 0;">
+        Pour au moins un cours, le nombre autorisé est dépassé. Voir le détail sur
+        <a href="{% url 'mes_absences' %}">Mes absences</a> ou contactez la scolarité.
+    </p>
+</div>
+{% endif %}
+
+<div class="simple-actions">
+    <a class="action-tile" href="{% url 'mon_profil' %}">
+        <span class="action-tile-title">Mon profil</span>
+        <span class="action-tile-desc">Nom affiché, téléphone</span>
+    </a>
+    {% if role_etudiant or role_admin_app or user.is_superuser %}
+    <a class="action-tile" href="{% url 'mes_absences' %}">
+        <span class="action-tile-title">Mes absences</span>
+        <span class="action-tile-desc">Étudiant : voir l’historique</span>
+    </a>
+    <a class="action-tile" href="{% url 'pointage_gps' %}">
+        <span class="action-tile-title">Enregistrer ma position</span>
+        <span class="action-tile-desc">GPS (optionnel)</span>
+    </a>
+    {% endif %}
+    {% if role_enseignant or role_admin_app or user.is_superuser %}
+    <a class="action-tile" href="{% url 'enseignant_cours' %}">
+        <span class="action-tile-title">Mes cours</span>
+        <span class="action-tile-desc">Voir et saisir des absences</span>
+    </a>
+    {% endif %}
+    {% if role_scolarite or role_admin_app or user.is_superuser %}
+    <a class="action-tile" href="{% url 'gestion_donnees' %}">
+        <span class="action-tile-title">Gestion données</span>
+        <span class="action-tile-desc">Créer étudiants, cours, enseignants</span>
+    </a>
+    <a class="action-tile" href="{% url 'scolarite_alertes' %}">
+        <span class="action-tile-title">Alertes</span>
+        <span class="action-tile-desc">Seuils d’absences non justifiées</span>
+    </a>
+    <a class="action-tile" href="{% url 'scolarite_absences_a_traiter' %}">
+        <span class="action-tile-title">Traiter des absences</span>
+        <span class="action-tile-desc">Marquer justifié / modifier le motif</span>
+    </a>
+    <a class="action-tile" href="{% url 'scolarite_synthese' %}">
+        <span class="action-tile-title">Synthèse</span>
+        <span class="action-tile-desc">Classement par nombre d’absences</span>
+    </a>
+    {% endif %}
+    <a class="action-tile" href="{% url 'notifications' %}">
+        <span class="action-tile-title">Notifications</span>
+        <span class="action-tile-desc">Messages reçus</span>
+    </a>
+</div>
+{% endblock %}

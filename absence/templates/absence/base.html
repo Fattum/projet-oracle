@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Accueil{% endblock %} — Absences</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'absence/app.css' %}">
+</head>
+<body class="app-body">
+    <a href="#main" class="skip-link">Aller au contenu</a>
+    {% if user.is_authenticated %}
+    <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-controls="app-sidebar" aria-expanded="false" aria-label="Menu">
+        <span class="sidebar-toggle-bar" aria-hidden="true"></span>
+        <span class="sidebar-toggle-bar" aria-hidden="true"></span>
+        <span class="sidebar-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <div class="sidebar-overlay" id="sidebar-overlay" hidden aria-hidden="true"></div>
+    {% endif %}
+    <div class="layout">
+        <aside class="sidebar" id="app-sidebar" aria-label="Menu">
+            <div class="sidebar-brand">
+                <span class="logo-mark">A</span>
+                <div>
+                    <strong>Absences</strong>
+                    <small>Projet ISCAE</small>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Accueil</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'mon_profil' %}" class="nav-item {% if request.resolver_match.url_name == 'mon_profil' %}active{% endif %}">Profil</a>
+                {% endif %}
+                {% if role_etudiant or role_admin_app or user.is_superuser %}
+                <a href="{% url 'mes_absences' %}" class="nav-item {% if 'mes_absences' in request.resolver_match.url_name %}active{% endif %}">Mes absences</a>
+                <a href="{% url 'pointage_gps' %}" class="nav-item {% if request.resolver_match.url_name == 'pointage_gps' %}active{% endif %}">Position GPS</a>
+                {% endif %}
+                {% if role_enseignant or role_admin_app or user.is_superuser %}
+                <a href="{% url 'enseignant_cours' %}" class="nav-item {% if 'enseignant' in request.resolver_match.url_name %}active{% endif %}">Enseignant</a>
+                {% endif %}
+                {% if role_scolarite or role_admin_app or user.is_superuser %}
+                <a href="{% url 'gestion_donnees' %}" class="nav-item {% if 'gestion' in request.resolver_match.url_name %}active{% endif %}">Gestion données</a>
+                <a href="{% url 'scolarite_alertes' %}" class="nav-item {% if request.resolver_match.url_name == 'scolarite_alertes' %}active{% endif %}">Alertes</a>
+                <a href="{% url 'scolarite_absences_a_traiter' %}" class="nav-item {% if request.resolver_match.url_name == 'scolarite_absences_a_traiter' or request.resolver_match.url_name == 'scolarite_justifier_absence' %}active{% endif %}">Traiter absences</a>
+                <a href="{% url 'scolarite_synthese' %}" class="nav-item {% if request.resolver_match.url_name == 'scolarite_synthese' %}active{% endif %}">Synthèse</a>
+                {% endif %}
+                <a href="{% url 'notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                    Notifications{% if notif_non_lues %} <span class="badge">{{ notif_non_lues }}</span>{% endif %}
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                <div class="user-block">
+                    <span class="user-name">{{ nav_display_name }}</span>
+                    {% if role_labels %}
+                    <div class="role-pills">{% for r in role_labels %}<span class="pill-role">{{ r }}</span>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'logout' %}" class="btn btn-ghost btn-sm">Déconnexion</a>
+                {% endif %}
+            </div>
+        </aside>
+        <div class="main-wrap">
+            <header class="top-header">
+                <h1 class="page-heading">{% block page_heading %}Application{% endblock %}</h1>
+                <div class="header-meta">{% block header_meta %}{% endblock %}</div>
+            </header>
+            <main id="main" class="main-content">
+                {% if messages %}
+                    <ul class="flash-list" role="status">
+                        {% for message in messages %}
+                            <li class="flash flash-{{ message.tags|default:'info' }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+    <script>
+    (function () {
+        var t = document.getElementById('sidebar-toggle');
+        var s = document.getElementById('app-sidebar');
+        var o = document.getElementById('sidebar-overlay');
+        if (!t || !s || !o) return;
+        function openNav() {
+            s.classList.add('sidebar-open');
+            o.hidden = false;
+            o.setAttribute('aria-hidden', 'false');
+            t.setAttribute('aria-expanded', 'true');
+            document.body.classList.add('nav-open');
+        }
+        function closeNav() {
+            s.classList.remove('sidebar-open');
+            o.hidden = true;
+            o.setAttribute('aria-hidden', 'true');
+            t.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('nav-open');
+        }
+        t.addEventListener('click', function () {
+            if (s.classList.contains('sidebar-open')) closeNav(); else openNav();
+        });
+        o.addEventListener('click', closeNav);
+        window.addEventListener('resize', function () {
+            if (window.matchMedia('(min-width: 901px)').matches) closeNav();
+        });
+    })();
+    </script>
+    {% endif %}
+</body>
+</html>

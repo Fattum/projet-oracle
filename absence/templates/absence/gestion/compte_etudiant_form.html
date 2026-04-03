@@ -1,0 +1,24 @@
+{% extends "absence/base.html" %}
+{% block title %}Compte étudiant{% endblock %}
+{% block page_heading %}Créer un compte de connexion pour un étudiant{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+{% endblock %}
+
+{% block content %}
+<div class="card card-muted" style="max-width: 640px; margin-bottom: 1.5rem;">
+    <h3 class="card-title">Pourquoi cette étape ?</h3>
+    <p class="small">La <strong>fiche étudiant</strong> (matricule, nom…) est dans la base métier. Pour que la personne <strong>ouvre la session</strong> et voie « Mes absences », il faut aussi :</p>
+    <ol class="list-compact small">
+        <li>Un <strong>utilisateur Django</strong> (login + mot de passe).</li>
+        <li>Le groupe <strong>Étudiant</strong>.</li>
+        <li>Un <strong>lien</strong> entre cet utilisateur et la fiche étudiant (fait automatiquement par ce formulaire).</li>
+    </ol>
+    <p class="small text-muted">Ensuite l’étudiant va sur <strong>Connexion</strong> et utilise le nom d’utilisateur et le mot de passe que vous définissez ici.</p>
+</div>
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Créer le compte</button>
+</form>
+{% endblock %}

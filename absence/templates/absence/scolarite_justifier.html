@@ -1,0 +1,27 @@
+{% extends "absence/base.html" %}
+{% block title %}Modifier une absence{% endblock %}
+{% block page_heading %}Modifier une absence{% endblock %}
+{% block header_meta %}
+<a class="btn btn-secondary btn-sm" href="{% url 'scolarite_absences_a_traiter' %}">← Retour à la liste</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 640px;">
+    <dl class="dl-inline">
+        <dt>Étudiant</dt>
+        <dd>{{ absence.id_inscription.id_etudiant.prenom }} {{ absence.id_inscription.id_etudiant.nom }}
+            ({{ absence.id_inscription.id_etudiant.matricule }})</dd>
+        <dt>Cours</dt>
+        <dd>{{ absence.id_inscription.id_cours.code_cours }} — {{ absence.id_inscription.id_cours.intitule }}</dd>
+        <dt>Séance</dt>
+        <dd>{{ absence.id_seance.date_seance|date:"d/m/Y" }} · {{ absence.id_seance.heure_debut }}–{{ absence.id_seance.heure_fin }}h</dd>
+        <dt>Année</dt>
+        <dd>{{ absence.id_inscription.id_annee.libelle }}</dd>
+    </dl>
+    <form method="post" class="stack-form" style="max-width: 100%;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+</div>
+{% endblock %}

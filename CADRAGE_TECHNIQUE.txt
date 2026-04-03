@@ -1,0 +1,68 @@
+================================================================================
+Rappel technique — Application Web Django & Oracle (Gestion des absences)
+================================================================================
+
+1. BASE DE DONNÉES ORACLE (partie centrale)
+--------------------------------------------------------------------------------
+Schéma : scripts oracle/01_tables_sequences.sql puis 02_package_and_triggers.sql
+
+• Normalisation : entités FILIERE, ANNEE_UNIV, COURS, ETUDIANT, INSCRIPTION,
+  SEANCE, PARAM_GLOBAL_ANNEE, PARAM_COURS_SEUIL, ABSENCE, HISTORIQUE_ALERTE.
+
+• Intégrité : clés primaires, clés étrangères, UNIQUE, CHECK, NOT NULL.
+
+• Package PKG_GESTION_ABSENCES :
+  - F_NB_ABSENCES_NON_JUST
+  - F_SEUIL_NON_JUSTIF
+  - P_ENREGISTRER_ABSENCE (validation étudiant actif, cohérence cours/année)
+
+• Triggers significatifs :
+  - TRG_INSCRIPTION_BI_ETU : inscription seulement si étudiant ACTIF
+  - TRG_ABSENCE_BI_VALID : alignement inscription / séance, inscription validée
+  - TRG_ABSENCE_AIUD_QUOTA : écriture HISTORIQUE_ALERTE au franchissement du seuil
+  - TRG_SEANCE_BU : interdiction de modifier une séance ayant déjà des absences
+
+• Utilisateur Oracle : compte technique dédié (ex. OORACLE), non utilisateur
+  métier. Privilèges limités ; rôle optionnel : oracle/04_privileges_role.sql
+
+• Transactions : la saisie d’absence côté Django utilise transaction.atomic()
+  et, sous Oracle, la procédure stockée dans la même unité de travail.
+
+2. PARTIE DJANGO
+--------------------------------------------------------------------------------
+• Utilisateurs finaux : exclusivement dans Django (AUTH_USER, groupes).
+
+• Groupes (rôles applicatifs) :
+  - Etudiant      → Mes absences, pointage GPS
+  - Enseignant    → Cours, liste absences, saisie (package Oracle si connecté)
+  - Scolarite     → Alertes Oracle, synthèse absences non justifiées
+  - Admin_application → Vue large + compte staff pour /admin/
+
+• Modèles Django uniquement (hors tables Oracle métier) :
+  - LIEN_COMPTE_ETUDIANT (ProfilEtudiant)
+  - NotificationApp (notifications in-app)
+  - PointageGPS (géolocalisation navigateur, traçabilité)
+
+• Fonctionnalités avancées retenues :
+  - Notifications applicatives (table Django + flux après saisie enseignant)
+  - Géolocalisation (API Geolocation + enregistrement PointageGPS)
+  - Messages Django (flash) pour retour utilisateur
+
+3. COMMUNICATION DJANGO ↔ ORACLE
+--------------------------------------------------------------------------------
+• Connexion via utilisateur technique (variables d’environnement ORACLE_*).
+
+• ORM sur tables unmanaged (db_table = noms Oracle).
+
+• Appel procédure : absence/services/oracle_absences.py (vendor oracle).
+
+• Développement local : SQLite + migration 0002 (schéma métier simplifié) ;
+  insertion ORM sans package Oracle.
+
+4. COMMANDES UTILES
+--------------------------------------------------------------------------------
+  python manage.py migrate
+  python manage.py seed_demo
+  python manage.py createsuperuser   (optionnel, accès total)
+
+================================================================================

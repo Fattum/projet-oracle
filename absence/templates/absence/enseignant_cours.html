@@ -1,0 +1,28 @@
+{% extends "absence/base.html" %}
+{% block title %}Enseignant — Cours{% endblock %}
+{% block page_heading %}Espace enseignant{% endblock %}
+{% block header_meta %}{% endblock %}
+
+{% block content %}
+<p class="lead text-muted">Choisissez un cours pour voir les absences ou en ajouter une.</p>
+{% if cours_list %}
+<ul class="link-list">
+    {% for c in cours_list %}
+    <li>
+        <div class="link-row">
+            <div>
+                <strong>{{ c.code_cours }}</strong> — {{ c.intitule }}
+                <span class="text-muted small">coef. {{ c.coef }}</span>
+            </div>
+            <div class="row-actions">
+                <a href="{% url 'enseignant_cours_absences' c.id_cours %}" class="btn btn-secondary btn-sm">Absences</a>
+                <a href="{% url 'enseignant_saisir_absence' c.id_cours %}" class="btn btn-primary btn-sm">Saisir</a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">Aucun cours.</p>
+{% endif %}
+{% endblock %}

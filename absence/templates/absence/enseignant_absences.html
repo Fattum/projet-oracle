@@ -1,0 +1,39 @@
+{% extends "absence/base.html" %}
+{% block title %}Absences — {{ cours.code_cours }}{% endblock %}
+{% block page_heading %}{{ cours.code_cours }} — Absences{% endblock %}
+{% block header_meta %}
+<a href="{% url 'enseignant_cours' %}" class="btn btn-secondary btn-sm">← Cours</a>
+<a href="{% url 'enseignant_saisir_absence' cours.id_cours %}" class="btn btn-primary btn-sm">Saisir une absence</a>
+{% endblock %}
+
+{% block content %}
+{% if annee %}<p class="text-muted small">Filtré sur l’année <strong>{{ annee.libelle }}</strong></p>{% endif %}
+{% if absences %}
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date saisie</th>
+                <th>Étudiant</th>
+                <th>Séance</th>
+                <th>Justifiée</th>
+                <th>Motif</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in absences %}
+            <tr>
+                <td>{{ a.date_saisie|date:"d/m/Y H:i" }}</td>
+                <td>{{ a.id_inscription.id_etudiant.prenom }} {{ a.id_inscription.id_etudiant.nom }} <span class="text-muted">({{ a.id_inscription.id_etudiant.matricule }})</span></td>
+                <td>{{ a.id_seance.date_seance|date:"d/m/Y" }}</td>
+                <td>{% if a.justifiee == 'O' %}Oui{% else %}Non{% endif %}</td>
+                <td>{{ a.motif|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">Aucune absence pour ce cours.</p>
+{% endif %}
+{% endblock %}

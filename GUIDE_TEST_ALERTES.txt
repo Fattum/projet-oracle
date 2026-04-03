@@ -1,0 +1,90 @@
+================================================================================
+GUIDE DE TEST — Cours, séances, étudiants, absences et ALERTES (seuil 3)
+================================================================================
+
+Préparation (une fois)
+----------------------
+  cd dossier_du_projet
+  python manage.py migrate
+  python manage.py seed_demo
+  python manage.py seed_scenario_alerte
+
+La commande seed_scenario_alerte crée :
+  • Cours ALERT01 (« Cours démo — test des alertes »)
+  • Étudiant matricule ALERT_ETU1 (Alex Dupont)
+  • Inscription : cet étudiant est inscrit à ALERT01 pour l’année en base (ex. 2024-2025)
+  • Seuil = 3 absences non justifiées pour ce cours / cette année
+  • 4 séances (dates en nov. 2024) pour pouvoir saisir 3 absences sur 3 jours différents
+
+Les données sont enregistrées dans la BASE (fichier db.sqlite3 en local, ou Oracle).
+
+
+Étape A — Enregistrer 3 absences non justifiées
+------------------------------------------------
+1. Démarrer : python manage.py runserver
+
+2. Ouvrir : http://127.0.0.1:8000/accounts/login/
+
+3. Se connecter avec le compte ENSEIGNANT :
+     Identifiant : prof
+     Mot de passe  : demo123
+   (sauf si vous avez utilisé seed_demo --password autre_chose)
+
+4. Menu « Enseignant » (ou équivalent) → cliquer sur le cours **ALERT01**
+
+5. Bouton « Saisir » (déclarer une absence)
+
+6. Remplir le formulaire :
+     Étudiant : choisir la ligne avec ALERT_ETU1 — Alex Dupont
+     Séance   : choisir la première date proposée (ex. 06/11/2024)
+     Justifiée : Non
+     Motif : optionnel (ex. « test 1 »)
+   → Enregistrer
+
+7. Répéter « Saisir » deux fois encore :
+     - même étudiant ALERT_ETU1
+     - une AUTRE séance à chaque fois (dates différentes)
+     - Justifiée : Non
+   Important : 3 séances différentes (la base interdit 2 absences sur la même séance).
+
+
+Étape B — Voir l’alerte
+-----------------------
+8. Se déconnecter
+
+9. Se connecter avec le compte SCOLARITÉ :
+     Identifiant : scolarite
+     Mot de passe  : demo123
+
+10. Menu « Alertes » → http://127.0.0.1:8000/scolarite/alertes/
+
+11. Vous devez voir un message du type « Quota atteint : 3 absence(s) non justifiées
+    (seuil 3) pour le cours ALERT01 … »
+
+
+Notes
+-----
+• Si vous ne voyez pas le cours ALERT01 en enseignant, vérifiez que seed_scenario_alerte
+  s’est bien exécuté sans erreur.
+
+• Si la liste « Étudiant » est vide pour ALERT01 : l’inscription manque — relancez
+  seed_scenario_alerte ou Gestion données → Inscription au cours.
+
+• En SQLite : après cette mise à jour du projet, la création d’alerte à la 3e absence
+  est gérée par un petit module Django (équivalent simplifié du trigger Oracle).
+
+• En Oracle : c’est le trigger / package qui crée l’alerte ; le test reste le même
+  côté interface (3 absences non justifiées, 3 séances distinctes).
+
+
+Créer votre propre scénario à la main
+-------------------------------------
+  Gestion données (compte scolarite ou adminapp) :
+    1. Nouveau cours (ex. code MONCOURS)
+    2. Nouvelle fiche étudiant
+    3. Inscription au cours : étudiant + MONCOURS + année
+    4. Nouvelle séance : MONCOURS + même année + date + heures (plusieurs dates)
+  Le seuil par défaut global est souvent 3 ; pour forcer 3 sur un cours :
+    Admin Django → Param cours seuil (ou seed avec ParamCoursSeuil).
+
+================================================================================

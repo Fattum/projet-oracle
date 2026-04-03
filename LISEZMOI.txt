@@ -1,0 +1,74 @@
+================================================================================
+  PROJET : GESTION DES ABSENCES (Django + base de données Oracle ou SQLite)
+================================================================================
+
+À QUOI ÇA SERT ?
+----------------
+C’est une petite application web pour une école :
+
+  • Les ÉTUDIANTS voient leurs absences et peuvent enregistrer une position GPS.
+  • Les ENSEIGNANTS choisissent un cours et déclarent qu’un étudiant était absent.
+  • La SCOLARITÉ voit des alertes quand un étudiant a trop d’absences non justifiées,
+    peut modifier le statut « justifié » et le motif, et consulte des statistiques.
+  • L’ADMIN APPLICATION voit tout (comme un directeur informatique de démo).
+
+Les comptes et les droits sont gérés par Django (pas par Oracle). Chaque utilisateur
+appartient à un ou plusieurs « groupes » : Etudiant, Enseignant, Scolarite,
+Admin_application.
+
+
+COMMENT LANCER LE PROJET SUR VOTRE PC ?
+----------------------------------------
+1) Installer Python 3 et les dépendances :
+       pip install -r requirements.txt
+
+2) Créer les tables et les comptes de test :
+       python manage.py migrate
+       python manage.py seed_demo
+
+3) Démarrer le site :
+       python manage.py runserver
+
+4) Ouvrir le navigateur à l’adresse indiquée (souvent http://127.0.0.1:8000/)
+   et aller sur la page de connexion.
+
+COMPTES DE DÉMO (mot de passe : demo123)
+-----------------------------------------
+  etudiant   → voir ses absences
+  prof       → enseignant
+  scolarite  → scolarité
+  adminapp   → tout voir + lien administration
+
+
+DEUX MODES POUR LA BASE DE DONNÉES
+-----------------------------------
+• Par défaut (sans configuration) : SQLite = fichier db.sqlite3 sur votre machine.
+  Pratique pour développer et pour la démo du projet.
+
+• Avec Oracle : il faut définir des variables d’environnement (ORACLE_USER, etc.)
+  comme dans les commentaires de projet_oracle/settings.py, et avoir exécuté les
+  scripts SQL du dossier oracle/ sur le serveur Oracle.
+
+Le site affiche sur l’accueil si vous êtes en mode SQLite ou Oracle.
+
+
+OÙ EST LA « VRAIE » LOGIQUE MÉTIER ?
+------------------------------------
+Pour le rendu universitaire : une grande partie des règles (vérifications, seuils,
+alertes) est dans la base Oracle : tables avec contraintes, procédures dans un
+package, triggers. Django affiche les écrans et appelle la base ; il gère les
+utilisateurs, les notifications et le GPS.
+
+Dans le dossier oracle/ vous trouverez les scripts à montrer au correcteur.
+
+
+FICHIERS UTILES
+---------------
+  manage.py              — commandes Django
+  absence/               — pages et modèles de l’application
+  oracle/                — scripts SQL Oracle (tables, package, triggers, droits)
+  requirements.txt       — bibliothèques Python
+
+En cas de page vide ou d’erreur : migrate puis seed_demo, puis reconnectez-vous.
+
+================================================================================

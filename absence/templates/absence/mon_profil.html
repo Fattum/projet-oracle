@@ -1,0 +1,31 @@
+{% extends "absence/base.html" %}
+{% block title %}Profil{% endblock %}
+{% block page_heading %}Mon profil{% endblock %}
+
+{% block content %}
+<p class="text-muted">Compte : <strong>{{ user.username }}</strong></p>
+
+<div class="grid-2">
+    <article class="card">
+        <h3 class="card-title">Informations personnelles</h3>
+        <p class="small text-muted">Ces champs servent uniquement à l’affichage dans l’application.</p>
+        <form method="post" class="stack-form" style="max-width: 100%;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+    </article>
+    <article class="card card-muted">
+        <h3 class="card-title">Qui fait quoi ?</h3>
+        <ul class="list-compact">
+            <li><strong>Étudiant</strong> : consulter ses absences, enregistrer une position GPS.</li>
+            <li><strong>Enseignant</strong> : choisir un cours et enregistrer une absence.</li>
+            <li><strong>Scolarité</strong> : lire les alertes, corriger le statut « justifié », voir les statistiques.</li>
+            <li><strong>Admin application</strong> : accès à tout + page d’administration si le compte est « staff ».</li>
+        </ul>
+        {% if user.is_staff %}
+        <p class="small"><a class="btn btn-secondary btn-sm" href="/admin/">Ouvrir l’administration</a></p>
+        {% endif %}
+    </article>
+</div>
+{% endblock %}

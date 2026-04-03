@@ -1,0 +1,14 @@
+{% extends "absence/base.html" %}
+{% block title %}Nouvel étudiant{% endblock %}
+{% block page_heading %}Nouvel étudiant{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Retour</a>
+{% endblock %}
+
+{% block content %}
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+</form>
+{% endblock %}

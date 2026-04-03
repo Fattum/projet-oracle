@@ -1,0 +1,15 @@
+{% extends "absence/base.html" %}
+{% block title %}Nouvel enseignant{% endblock %}
+{% block page_heading %}Nouveau compte enseignant{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Retour</a>
+{% endblock %}
+
+{% block content %}
+<p class="small text-muted">Crée un utilisateur Django avec le droit d’accéder à l’espace enseignant (déclarer des absences).</p>
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Créer le compte</button>
+</form>
+{% endblock %}

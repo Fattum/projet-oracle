@@ -1,0 +1,92 @@
+{% extends "absence/base.html" %}
+{% block title %}Gestion des données{% endblock %}
+{% block page_heading %}Gestion des données{% endblock %}
+
+{% block content %}
+<p class="text-muted">Réservé à la <strong>scolarité</strong> et à l’<strong>admin application</strong>.</p>
+
+{% if erreur %}
+<div class="alert alert-warn">Données indisponibles. Lancez <code>python manage.py migrate</code> puis <code>seed_demo</code>.</div>
+{% else %}
+<p class="small">Résumé : <strong>{{ nb_etu }}</strong> étudiant(s), <strong>{{ nb_cours }}</strong> cours.</p>
+<p class="small text-muted">Les données viennent de la <strong>base de données</strong> (fichier <code>db.sqlite3</code> en local, ou <strong>Oracle</strong> si configuré) : rien n’est codé « en dur » dans les pages. Chaque formulaire lit et enregistre dans ces tables.</p>
+{% endif %}
+
+<div class="card card-muted" style="margin-top: 1rem;">
+    <h3 class="card-title">Ordre recommandé (pour que le prof voie tout le monde)</h3>
+    <ol class="list-compact small">
+        <li><strong>Fiche étudiant</strong> (identité, filière).</li>
+        <li><strong>Inscription au cours</strong> : lier cet étudiant au cours (ex. BD501) + la <strong>même année</strong> que celle utilisée par l’application (ex. 2024-2025).</li>
+        <li><strong>Séances</strong> : au moins une séance par date où vous voulez déclarer une absence (cours + année + date + heures).</li>
+        <li>Optionnel : <strong>compte connexion étudiant</strong> pour qu’il se connecte et voie « Mes absences ».</li>
+    </ol>
+    <p class="small text-muted mb-0">Si vous ne voyez qu’un seul nom pour BD501, ouvrez <a href="{% url 'gestion_inscriptions_liste' %}">Liste des inscriptions</a> : vous verrez qu’il n’y a qu’une ligne — ajoutez une inscription par étudiant supplémentaire.</p>
+</div>
+
+<h3 class="card-title" style="margin-top: 1.5rem;">Voir les listes</h3>
+<div class="simple-actions">
+    <a class="action-tile" href="{% url 'gestion_inscriptions_liste' %}">
+        <span class="action-tile-title">Inscriptions aux cours</span>
+        <span class="action-tile-desc">Qui est inscrit à BD501 ?</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_seances_liste' %}">
+        <span class="action-tile-title">Liste des séances</span>
+        <span class="action-tile-desc">Dates et créneaux par cours</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_etudiants_liste' %}">
+        <span class="action-tile-title">Liste des étudiants</span>
+        <span class="action-tile-desc">Matricule, filière, compte de connexion</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_cours_liste' %}">
+        <span class="action-tile-title">Liste des cours</span>
+        <span class="action-tile-desc">Codes et intitulés</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_enseignants_liste' %}">
+        <span class="action-tile-title">Liste des enseignants</span>
+        <span class="action-tile-desc">Comptes du groupe Enseignant</span>
+    </a>
+</div>
+
+<h3 class="card-title" style="margin-top: 1.5rem;">Ajouter</h3>
+<div class="simple-actions">
+    <a class="action-tile" href="{% url 'gestion_etudiant_nouveau' %}">
+        <span class="action-tile-title">Nouvelle fiche étudiant</span>
+        <span class="action-tile-desc">Données dans la base</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_compte_etudiant_nouveau' %}">
+        <span class="action-tile-title">Compte connexion étudiant</span>
+        <span class="action-tile-desc">Login + lien vers la fiche</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_inscription_nouvelle' %}">
+        <span class="action-tile-title">Inscription au cours</span>
+        <span class="action-tile-desc">Lier étudiant ↔ cours ↔ année</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_seance_nouvelle' %}">
+        <span class="action-tile-title">Nouvelle séance</span>
+        <span class="action-tile-desc">Date + heures pour un cours</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_cours_nouveau' %}">
+        <span class="action-tile-title">Nouveau cours</span>
+        <span class="action-tile-desc">Code, intitulé, coefficient</span>
+    </a>
+    <a class="action-tile" href="{% url 'gestion_enseignant_nouveau' %}">
+        <span class="action-tile-title">Nouveau compte enseignant</span>
+        <span class="action-tile-desc">Login groupe Enseignant</span>
+    </a>
+</div>
+
+<div class="card" style="margin-top: 2rem; border-color: #c7d2fe;">
+    <h3 class="card-title">Les alertes : comment ça marche ?</h3>
+    <p class="small"><strong>Où les voir ?</strong> Menu <strong>Alertes</strong> (<code>/scolarite/alertes/</code>) pour la scolarité / admin. L’étudiant concerné les voit aussi sur l’<strong>accueil</strong> et <strong>Mes absences</strong>.</p>
+    <p class="small"><strong>Que contiennent-elles ?</strong> Un message du type « un étudiant a trop d’absences <em>non justifiées</em> pour un cours », avec le nombre et le seuil.</p>
+    <p class="small"><strong>Quand apparaissent-elles ?</strong></p>
+    <ul class="list-compact small">
+        <li>Il existe un <strong>seuil</strong> (en démo : <strong>3</strong> absences non justifiées pour BD501), défini en base par année ou par cours.</li>
+        <li>Un <strong>enseignant</strong> enregistre des absences marquées <strong>non justifiées</strong>.</li>
+        <li>Dès que le nombre dépasse le seuil, le système enregistre une <strong>alerte</strong> dans l’historique.</li>
+    </ul>
+    <p class="small"><strong>Avec Oracle</strong> (scripts du dossier <code>oracle/</code>) : c’est la base qui crée l’alerte automatiquement (logique métier côté Oracle).</p>
+    <p class="small"><strong>Avec SQLite</strong> sur votre PC : cette automatisation n’est pas reproduite ; pour la démo, vous pouvez ajouter des lignes manuellement dans l’admin Django → <em>Historique alerte</em>, ou tester sur Oracle.</p>
+    <p class="small"><strong>Test guidé (recommandé)</strong> : dans un terminal, <code>python manage.py seed_scenario_alerte</code> puis suivez le texte affiché ou le fichier <code>GUIDE_TEST_ALERTES.txt</code> à la racine du projet (cours <strong>ALERT01</strong>, seuil 3, SQLite ou Oracle).</p>
+</div>
+{% endblock %}

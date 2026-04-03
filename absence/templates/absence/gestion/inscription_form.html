@@ -1,0 +1,18 @@
+{% extends "absence/base.html" %}
+{% block title %}Inscription cours{% endblock %}
+{% block page_heading %}Inscrire un étudiant à un cours{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+<a href="{% url 'gestion_inscriptions_liste' %}" class="btn btn-secondary btn-sm">Voir toutes les inscriptions</a>
+{% endblock %}
+
+{% block content %}
+<div class="card card-muted" style="max-width: 640px; margin-bottom: 1.5rem;">
+    <p class="small"><strong>Pourquoi ?</strong> Le professeur ne voit dans « Déclarer une absence » que les étudiants qui ont une <strong>inscription validée</strong> pour <strong>ce cours</strong> et <strong>l’année universitaire en cours</strong>. Créer seulement la fiche étudiant ne suffit pas : il faut aussi cette inscription.</p>
+</div>
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enregistrer l’inscription</button>
+</form>
+{% endblock %}

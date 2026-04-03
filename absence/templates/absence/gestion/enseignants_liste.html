@@ -1,0 +1,32 @@
+{% extends "absence/base.html" %}
+{% block title %}Liste des enseignants{% endblock %}
+{% block page_heading %}Comptes enseignants{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+{% endblock %}
+
+{% block content %}
+<p class="text-muted small">Liste des utilisateurs du groupe <strong>Enseignant</strong> (connexion sur la même page que tout le monde : <code>/accounts/login/</code>).</p>
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Identifiant</th>
+                <th>E-mail</th>
+                <th>Actif</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in enseignants %}
+            <tr>
+                <td><strong>{{ u.username }}</strong></td>
+                <td>{{ u.email|default:"—" }}</td>
+                <td>{% if u.is_active %}Oui{% else %}Non{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-muted">Aucun compte enseignant. Utilisez « Nouveau compte enseignant » dans la gestion.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

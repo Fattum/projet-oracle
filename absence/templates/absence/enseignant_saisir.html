@@ -1,0 +1,33 @@
+{% extends "absence/base.html" %}
+{% block title %}Saisir une absence{% endblock %}
+{% block page_heading %}Déclarer une absence — {{ cours.code_cours }}{% endblock %}
+{% block header_meta %}
+<a href="{% url 'enseignant_cours_absences' cours.id_cours %}" class="btn btn-secondary btn-sm">← Retour à la liste</a>
+{% endblock %}
+
+{% block content %}
+<p class="text-muted small">Année : <strong>{{ annee.libelle }}</strong></p>
+{% if role_scolarite or role_admin_app or user.is_superuser %}
+<div class="quick-links small" style="margin-bottom: 1rem; flex-wrap: wrap;">
+    <span class="text-muted">Gestion (scolarité / admin) :</span>
+    <a class="btn btn-secondary btn-sm" href="{% url 'gestion_inscriptions_liste' %}?cours={{ cours.pk }}">Inscriptions {{ cours.code_cours }}</a>
+    <a class="btn btn-secondary btn-sm" href="{% url 'gestion_inscription_nouvelle' %}?cours={{ cours.pk }}&annee={{ annee.pk }}">+ Inscription</a>
+    <a class="btn btn-secondary btn-sm" href="{% url 'gestion_seances_liste' %}?cours={{ cours.pk }}">Séances</a>
+    <a class="btn btn-secondary btn-sm" href="{% url 'gestion_seance_nouvelle' %}?cours={{ cours.pk }}&annee={{ annee.pk }}">+ Séance</a>
+</div>
+{% endif %}
+<p class="small">Remplissez le formulaire puis cliquez sur <strong>Enregistrer</strong>. La base vérifie que l’étudiant et la séance correspondent au même cours.</p>
+<p class="alert alert-info small">La liste « Étudiant » = une ligne par <strong>inscription validée</strong> (étudiant + ce cours + année {{ annee.libelle }}). Chaque nouvel étudiant doit avoir sa propre inscription ; sinon il n’apparaît pas ici.</p>
+
+<form method="post" class="stack-form" style="max-width: 520px;">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field.errors }}
+        {{ field }}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+</form>
+{% endblock %}

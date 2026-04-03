@@ -1,0 +1,25 @@
+{% extends "absence/base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block page_heading %}Notifications{% endblock %}
+
+{% block content %}
+<p class="text-muted small">Messages dans l’application : absences déclarées par un enseignant, <strong>seuil d’absences non justifiées</strong>, etc.</p>
+{% if notifs %}
+<ul class="notif-list">
+    {% for n in notifs %}
+    <li class="notif-item {% if not n.lu %}notif-unread{% endif %}">
+        <div>
+            <strong>{{ n.titre }}</strong>
+            <p class="small">{{ n.corps_affiche }}</p>
+            <span class="text-muted tiny">{{ n.date_envoi|date:"d/m/Y H:i" }}</span>
+        </div>
+        {% if not n.lu %}
+        <a href="{% url 'notification_lue' n.pk %}" class="btn btn-secondary btn-sm">Marquer comme lue</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">Aucune notification.</p>
+{% endif %}
+{% endblock %}

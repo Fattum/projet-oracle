@@ -1,0 +1,47 @@
+{% extends "absence/base.html" %}
+{% load humanize %}
+{% block title %}Absences à traiter{% endblock %}
+{% block page_heading %}Absences non justifiées{% endblock %}
+
+{% block content %}
+{% if erreur == 'no_annee' %}
+<div class="alert alert-warn">Il manque une année universitaire dans la base. Lancez <code>seed_demo</code>.</div>
+{% elif erreur == 'tables_metier' %}
+<div class="alert alert-warn">Données indisponibles. Lancez migrate puis seed_demo.</div>
+{% elif absences %}
+<p class="text-muted small">
+    Année <strong>{{ annee.libelle }}</strong> — {{ absences|length }} ligne(s) affichée(s) (les plus récentes en premier).
+</p>
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Étudiant</th>
+                <th>Cours</th>
+                <th>Séance</th>
+                <th>Date saisie</th>
+                <th>Motif</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in absences %}
+            <tr>
+                <td>
+                    <strong>{{ a.id_inscription.id_etudiant.matricule }}</strong><br>
+                    <span class="small">{{ a.id_inscription.id_etudiant.prenom }} {{ a.id_inscription.id_etudiant.nom }}</span>
+                </td>
+                <td>{{ a.id_inscription.id_cours.code_cours }}</td>
+                <td class="small">{{ a.id_seance.date_seance|date:"d/m/Y" }} · {{ a.id_seance.heure_debut }}–{{ a.id_seance.heure_fin }}h</td>
+                <td class="small">{{ a.date_saisie|date:"d/m/Y H:i" }}</td>
+                <td class="cell-msg">{{ a.motif|default:"—"|truncatechars:80 }}</td>
+                <td><a class="btn btn-primary btn-sm" href="{% url 'scolarite_justifier_absence' a.pk %}">Modifier</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">Aucune absence non justifiée pour cette année.</p>
+{% endif %}
+{% endblock %}

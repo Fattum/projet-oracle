@@ -1,0 +1,69 @@
+{% extends "absence/base.html" %}
+{% block title %}Mes absences{% endblock %}
+{% block page_heading %}Mes absences{% endblock %}
+
+{% block content %}
+{% if erreur == 'no_profil' %}
+    <div class="alert alert-warn">
+        <p><strong>Votre compte n’est pas lié à un étudiant.</strong> Un administrateur doit faire le lien dans l’administration Django (compte utilisateur ↔ fiche étudiant).</p>
+    </div>
+{% elif erreur == 'tables_metier' %}
+    <div class="alert alert-warn">
+        <p>Données absentes. Dans le dossier du projet : <code>python manage.py migrate</code> puis <code>python manage.py seed_demo</code>.</p>
+    </div>
+{% else %}
+    <div class="panel-head">
+        <p class="lead">
+            {{ profil.etudiant.prenom }} {{ profil.etudiant.nom }}
+            <span class="text-muted">· {{ profil.etudiant.matricule }}</span>
+        </p>
+    </div>
+    {% if alertes_seuil %}
+    <div class="alert alert-warn" style="margin-bottom:1.25rem;">
+        <strong>Attention — seuil d’absences non justifiées</strong>
+        <p class="small" style="margin:0.5rem 0 0 0;">
+            La scolarité est informée automatiquement. Détail ci-dessous ; rapprochez-vous d’eux si besoin.
+        </p>
+        <ul class="small" style="margin:0.75rem 0 0 1rem;">
+            {% for al in alertes_seuil %}
+            <li>
+                <strong>{{ al.id_cours.code_cours }}</strong> ({{ al.id_annee.libelle }}) —
+                {{ al.nb_abs_non_just }} absence(s) non justifiée(s) — {{ al.date_alerte|date:"d/m/Y H:i" }}
+                <br><span class="text-muted">{{ al.message }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if absences %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date saisie</th>
+                        <th>Cours</th>
+                        <th>Année</th>
+                        <th>Séance</th>
+                        <th>Justifiée</th>
+                        <th>Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in absences %}
+                    <tr>
+                        <td>{{ a.date_saisie|date:"d/m/Y H:i" }}</td>
+                        <td><strong>{{ a.id_inscription.id_cours.code_cours }}</strong> — {{ a.id_inscription.id_cours.intitule }}</td>
+                        <td>{{ a.id_inscription.id_annee.libelle }}</td>
+                        <td>{{ a.id_seance.date_seance|date:"d/m/Y" }} · {{ a.id_seance.heure_debut }}–{{ a.id_seance.heure_fin }}h</td>
+                        <td>{% if a.justifiee == 'O' %}<span class="pill pill-ok">Oui</span>{% else %}<span class="pill pill-warn">Non</span>{% endif %}</td>
+                        <td>{{ a.motif|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucune absence enregistrée.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

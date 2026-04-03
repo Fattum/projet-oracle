@@ -1,0 +1,40 @@
+{% extends "absence/base.html" %}
+{% block title %}Liste des étudiants{% endblock %}
+{% block page_heading %}Liste des étudiants{% endblock %}
+{% block header_meta %}
+<a href="{% url 'gestion_donnees' %}" class="btn btn-secondary btn-sm">← Gestion</a>
+{% endblock %}
+
+{% block content %}
+<p class="text-muted small">« Compte connexion » = identifiant pour se connecter sur la page <strong>Connexion</strong>, si vous avez utilisé <a href="{% url 'gestion_compte_etudiant_nouveau' %}">Créer un compte étudiant</a>.</p>
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Filière</th>
+                <th>Statut</th>
+                <th>Compte connexion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in lignes %}
+            {% with e=row.e %}
+            <tr>
+                <td><strong>{{ e.matricule }}</strong></td>
+                <td>{{ e.nom }}</td>
+                <td>{{ e.prenom }}</td>
+                <td>{{ e.id_filiere.code_filiere }}</td>
+                <td>{{ e.get_statut_display }}</td>
+                <td>{% if row.login %}<code>{{ row.login }}</code>{% else %}<span class="text-muted">aucun</span>{% endif %}</td>
+            </tr>
+            {% endwith %}
+            {% empty %}
+            <tr><td colspan="6" class="text-muted">Aucun étudiant.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
