@@ -5,9 +5,9 @@
 
 {% block content %}
 {% if erreur == 'no_annee' %}
-<div class="alert alert-warn">Il manque une année universitaire dans la base. Lancez <code>seed_demo</code>.</div>
+<div class="alert alert-warn">Aucune année universitaire n’est configurée. Contactez un administrateur.</div>
 {% elif erreur == 'tables_metier' %}
-<div class="alert alert-warn">Données indisponibles. Lancez migrate puis seed_demo.</div>
+<div class="alert alert-warn">Les données ne sont pas disponibles pour le moment. Réessayez plus tard ou contactez un administrateur.</div>
 {% elif absences %}
 <p class="text-muted small">
     Année <strong>{{ annee.libelle }}</strong> — {{ absences|length }} ligne(s) affichée(s) (les plus récentes en premier).

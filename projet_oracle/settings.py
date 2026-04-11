@@ -209,3 +209,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# -----------------------------------------------------------------------------
+# E-mail (alertes seuil, etc.) — variables dans .env, jamais de secrets dans le code
+# -----------------------------------------------------------------------------
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '').strip()
+try:
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+except ValueError:
+    EMAIL_PORT = 587
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in (
+    '1',
+    'true',
+    'yes',
+    'on',
+)
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS', '').strip()
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', '').strip()
+
+if EMAIL_HOST and EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+    SEUIL_EMAIL_ENABLED = True
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@localhost'
+    SEUIL_EMAIL_ENABLED = False

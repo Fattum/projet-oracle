@@ -268,36 +268,24 @@ class ProfilApp(models.Model):
         return self.nom_affiche or self.user.get_username()
 
 
-class PointageGPS(models.Model):
+class SeuilAlerteEmailEnvoye(models.Model):
     """
-    Trace de géolocalisation navigateur (justification de présence / contexte).
-    Données stockées côté Django, hors schéma métier Oracle.
+    Une ligne par alerte HISTORIQUE_ALERTE pour laquelle l’e-mail seuil a été envoyé.
+    Permet d’envoyer l’e-mail même si la notification in-app existait déjà.
     """
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='pointages_gps',
+    historique_alerte_id = models.IntegerField(
+        unique=True,
+        db_index=True,
+        help_text='PK de HISTORIQUE_ALERTE (Oracle / SQLite).',
     )
-    contexte = models.CharField(
-        max_length=120,
-        help_text='Ex. Arrivée campus, justification de déplacement',
-    )
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    precision_m = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        verbose_name='Précision (m)',
-    )
-    horodatage = models.DateTimeField(auto_now_add=True)
+    date_envoi = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-horodatage']
-        verbose_name = 'pointage GPS'
-        verbose_name_plural = 'pointages GPS'
+        db_table = 'ABSENCE_SEUIL_EMAIL_ENVOYE'
+        verbose_name = 'envoi e-mail seuil'
+        verbose_name_plural = 'envois e-mails seuil'
 
     def __str__(self):
-        return f'{self.user.username} — {self.contexte}'
+        return f'Alerte #{self.historique_alerte_id}'
+

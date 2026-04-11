@@ -1,17 +1,12 @@
 {% extends "absence/base.html" %}
 {% block title %}Accueil{% endblock %}
 {% block page_heading %}Accueil{% endblock %}
-{% block header_meta %}
-<span class="chip {% if oracle_actif %}chip-ok{% else %}chip-muted{% endif %}">
-    Base de données : {% if oracle_actif %}Oracle{% else %}SQLite (mode test){% endif %}
-</span>
-{% endblock %}
+{% block header_meta %}{% endblock %}
 
 {% block content %}
 {% if not has_any_app_role %}
 <div class="alert alert-warn">
-    <strong>Votre compte n’a pas de rôle.</strong> Demandez à un responsable de vous ajouter à un groupe
-    (Étudiant, Enseignant, Scolarité ou Admin), ou utilisez un compte de démo après <code>seed_demo</code>.
+    <strong>Votre compte n’a pas de rôle attribué.</strong> Contactez la scolarité ou un administrateur pour obtenir les accès correspondant à votre profil.
 </div>
 {% endif %}
 
@@ -42,10 +37,6 @@
     <a class="action-tile" href="{% url 'mes_absences' %}">
         <span class="action-tile-title">Mes absences</span>
         <span class="action-tile-desc">Étudiant : voir l’historique</span>
-    </a>
-    <a class="action-tile" href="{% url 'pointage_gps' %}">
-        <span class="action-tile-title">Enregistrer ma position</span>
-        <span class="action-tile-desc">GPS (optionnel)</span>
     </a>
     {% endif %}
     {% if role_enseignant or role_admin_app or user.is_superuser %}

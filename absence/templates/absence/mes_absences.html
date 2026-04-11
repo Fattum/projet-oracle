@@ -5,11 +5,11 @@
 {% block content %}
 {% if erreur == 'no_profil' %}
     <div class="alert alert-warn">
-        <p><strong>Votre compte n’est pas lié à un étudiant.</strong> Un administrateur doit faire le lien dans l’administration Django (compte utilisateur ↔ fiche étudiant).</p>
+        <p><strong>Votre compte n’est pas lié à une fiche étudiant.</strong> Contactez la scolarité ou un administrateur.</p>
     </div>
 {% elif erreur == 'tables_metier' %}
     <div class="alert alert-warn">
-        <p>Données absentes. Dans le dossier du projet : <code>python manage.py migrate</code> puis <code>python manage.py seed_demo</code>.</p>
+        <p>Les données ne sont pas disponibles pour le moment. Réessayez plus tard ou contactez un administrateur.</p>
     </div>
 {% else %}
     <div class="panel-head">

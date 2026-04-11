@@ -87,7 +87,7 @@ def creer_alerte_si_seuil_sqlite(sender, instance, created, **kwargs):
     try:
         pe = ProfilEtudiant.objects.get(etudiant_id=etu_id)
         al = (
-            HistoriqueAlerte.objects.select_related('id_cours', 'id_annee')
+            HistoriqueAlerte.objects.select_related('id_cours', 'id_annee', 'id_etudiant')
             .filter(id_etudiant_id=etu_id, id_cours_id=cours_id, id_annee_id=annee_id)
             .order_by('-date_alerte')
             .first()

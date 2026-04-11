@@ -6,14 +6,8 @@
 {% endblock %}
 
 {% block content %}
-<p class="small text-muted" style="margin-bottom:1rem;">
-    <strong>Comment tester ?</strong> Connectez-vous en enseignant (<code>prof</code>), enregistrez <strong>3</strong> absences
-    <strong>non justifiées</strong> pour le même étudiant sur <strong>3 séances différentes</strong> (seuil démo BD501 = <strong>3</strong>).
-    Avec <strong>Oracle</strong>, l’alerte apparaît ici automatiquement. Avec <strong>SQLite</strong>, voir l’aide sur la page
-    <a href="{% url 'gestion_donnees' %}">Gestion des données</a>.
-</p>
 {% if erreur == 'tables_metier' %}
-<div class="alert alert-warn">Les données ne sont pas accessibles. Lancez migrate et seed_demo.</div>
+<div class="alert alert-warn">Les données ne sont pas accessibles pour le moment. Réessayez plus tard ou contactez un administrateur.</div>
 {% elif alertes %}
 <div class="table-wrap">
     <table class="table">

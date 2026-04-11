@@ -6,7 +6,6 @@ from .models import (
     Cours,
     Etudiant,
     Inscription,
-    PointageGPS,
     ProfilApp,
     ProfilEtudiant,
     Seance,
@@ -296,31 +295,6 @@ class SaisieAbsenceForm(forms.Form):
             w = f.widget
             if isinstance(w, (forms.Select, forms.Textarea)):
                 w.attrs.setdefault('class', 'input')
-
-
-class PointageGPSForm(forms.ModelForm):
-    class Meta:
-        model = PointageGPS
-        fields = ('contexte', 'latitude', 'longitude', 'precision_m')
-        widgets = {
-            'latitude': forms.HiddenInput(),
-            'longitude': forms.HiddenInput(),
-            'precision_m': forms.HiddenInput(),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['precision_m'].required = False
-        self.fields['contexte'].widget.attrs.setdefault(
-            'placeholder',
-            'Ex. Arrivée à l’école, rendez-vous externe…',
-        )
-
-    def clean_precision_m(self):
-        v = self.cleaned_data.get('precision_m')
-        if v in ('', None):
-            return None
-        return v
 
 
 class JustifierAbsenceForm(forms.Form):

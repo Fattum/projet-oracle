@@ -83,5 +83,4 @@ urlpatterns = [
         views.notification_marquer_lue,
         name='notification_lue',
     ),
-    path('etudiant/pointage-gps/', views.pointage_gps, name='pointage_gps'),
 ]

@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from django.db import IntegrityError, connection
+from django.db import IntegrityError
 from django.db.models import Count
 from django.db.utils import DatabaseError, OperationalError
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,7 +19,6 @@ from .forms import (
     InscriptionForm,
     JustifierAbsenceForm,
     SeanceForm,
-    PointageGPSForm,
     ProfilAppForm,
     SaisieAbsenceForm,
 )
@@ -31,7 +30,6 @@ from .models import (
     HistoriqueAlerte,
     Inscription,
     NotificationApp,
-    PointageGPS,
     ProfilApp,
     ProfilEtudiant,
     Seance,
@@ -59,7 +57,7 @@ def _alertes_seuil_pour_etudiant(etudiant_id):
     try:
         return list(
             HistoriqueAlerte.objects.filter(id_etudiant_id=etudiant_id)
-            .select_related('id_cours', 'id_annee')
+            .select_related('id_cours', 'id_annee', 'id_etudiant')
             .order_by('-date_alerte')[:20]
         )
     except OperationalError:
@@ -85,8 +83,6 @@ def dashboard(request):
         request,
         'absence/dashboard.html',
         {
-            'backend_label': connection.vendor,
-            'oracle_actif': connection.vendor == 'oracle',
             'annee': annee,
             'alertes_seuil': alertes_seuil,
         },
@@ -137,8 +133,7 @@ def enseignant_cours(request):
         cours_list = []
         messages.warning(
             request,
-            'Données indisponibles. Sur votre PC : ouvrez un terminal dans le dossier du '
-            'projet et lancez : python manage.py migrate puis python manage.py seed_demo',
+            'Les données ne sont pas disponibles pour le moment.',
         )
     return render(
         request,
@@ -172,7 +167,10 @@ def enseignant_saisir_absence(request, cours_id):
     cours = get_object_or_404(Cours, pk=cours_id)
     annee = _annee_courante()
     if not annee:
-        messages.error(request, 'Il n’y a pas d’année universitaire dans la base. Lancez seed_demo ou ajoutez-en une.')
+        messages.error(
+            request,
+            'Aucune année universitaire n’est configurée. Contactez un administrateur.',
+        )
         return redirect('enseignant_cours')
 
     ins_qs = (
@@ -347,7 +345,7 @@ def mon_profil(request):
     except OperationalError:
         messages.error(
             request,
-            'Profil indisponible. Lancez : python manage.py migrate',
+            'Le profil ne peut pas être chargé. Réessayez plus tard ou contactez un administrateur.',
         )
         return redirect('dashboard')
     if request.method == 'POST':
@@ -424,27 +422,6 @@ def notification_marquer_lue(request, pk):
     return redirect('notifications')
 
 
-@role_required(roles.ETUDIANT, roles.ADMIN_APP)
-def pointage_gps(request):
-    if request.method == 'POST':
-        form = PointageGPSForm(request.POST)
-        if form.is_valid():
-            p = form.save(commit=False)
-            p.user = request.user
-            p.save()
-            messages.success(request, 'Votre position a été enregistrée.')
-            return redirect('pointage_gps')
-    else:
-        form = PointageGPSForm()
-
-    historique = PointageGPS.objects.filter(user=request.user)[:25]
-    return render(
-        request,
-        'absence/pointage_gps.html',
-        {'form': form, 'historique': historique},
-    )
-
-
 @role_required(roles.SCOLARITE, roles.ADMIN_APP)
 def gestion_donnees(request):
     """Menu : créer étudiants, cours, comptes enseignants."""
@@ -474,7 +451,10 @@ def gestion_etudiant_nouveau(request):
         else:
             form = EtudiantForm()
     except OperationalError:
-        messages.error(request, 'Base indisponible : migrate et seed_demo.')
+        messages.error(
+            request,
+            'Les données ne sont pas disponibles pour le moment.',
+        )
         return redirect('gestion_donnees')
     return render(request, 'absence/gestion/etudiant_form.html', {'form': form})
 
@@ -491,7 +471,10 @@ def gestion_cours_nouveau(request):
         else:
             form = CoursForm()
     except OperationalError:
-        messages.error(request, 'Base indisponible : migrate et seed_demo.')
+        messages.error(
+            request,
+            'Les données ne sont pas disponibles pour le moment.',
+        )
         return redirect('gestion_donnees')
     return render(request, 'absence/gestion/cours_form.html', {'form': form})
 
@@ -547,7 +530,10 @@ def gestion_inscription_nouvelle(request):
                     initial_ins['id_annee'] = an.pk
             form = InscriptionForm(initial=initial_ins)
     except OperationalError:
-        messages.error(request, 'Base indisponible : migrate et seed_demo.')
+        messages.error(
+            request,
+            'Les données ne sont pas disponibles pour le moment.',
+        )
         return redirect('gestion_donnees')
     return render(request, 'absence/gestion/inscription_form.html', {'form': form})
 
@@ -628,7 +614,10 @@ def gestion_seance_nouvelle(request):
         else:
             form = SeanceForm(initial=initial)
     except OperationalError:
-        messages.error(request, 'Base indisponible : migrate et seed_demo.')
+        messages.error(
+            request,
+            'Les données ne sont pas disponibles pour le moment.',
+        )
         return redirect('gestion_donnees')
     return render(request, 'absence/gestion/seance_form.html', {'form': form})
 
@@ -673,7 +662,7 @@ def gestion_enseignant_nouveau(request):
             except Group.DoesNotExist:
                 messages.error(
                     request,
-                    'Le groupe « Enseignant » est introuvable. Lancez : python manage.py migrate',
+                    'Configuration incomplète : le groupe « Enseignant » est introuvable. Contactez un administrateur.',
                 )
                 return render(
                     request,
@@ -757,7 +746,7 @@ def gestion_compte_etudiant_nouveau(request):
                 except Group.DoesNotExist:
                     messages.error(
                         request,
-                        'Le groupe « Etudiant » est introuvable. Lancez : python manage.py migrate',
+                        'Configuration incomplète : le groupe « Etudiant » est introuvable. Contactez un administrateur.',
                     )
                     return render(
                         request,
@@ -781,7 +770,10 @@ def gestion_compte_etudiant_nouveau(request):
         else:
             form = CreerCompteEtudiantForm()
     except OperationalError:
-        messages.error(request, 'Base indisponible : migrate et seed_demo.')
+        messages.error(
+            request,
+            'Les données ne sont pas disponibles pour le moment.',
+        )
         return redirect('gestion_donnees')
     return render(
         request,

@@ -67,11 +67,6 @@ class NotificationAppAdmin(admin.ModelAdmin):
     list_filter = ('lu',)
 
 
-@admin.register(models.PointageGPS)
-class PointageGPSAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'contexte', 'horodatage', 'latitude', 'longitude')
-
-
 @admin.register(models.ProfilApp)
 class ProfilAppAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'nom_affiche', 'telephone')

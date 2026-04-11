@@ -36,7 +36,6 @@
                 {% endif %}
                 {% if role_etudiant or role_admin_app or user.is_superuser %}
                 <a href="{% url 'mes_absences' %}" class="nav-item {% if 'mes_absences' in request.resolver_match.url_name %}active{% endif %}">Mes absences</a>
-                <a href="{% url 'pointage_gps' %}" class="nav-item {% if request.resolver_match.url_name == 'pointage_gps' %}active{% endif %}">Position GPS</a>
                 {% endif %}
                 {% if role_enseignant or role_admin_app or user.is_superuser %}
                 <a href="{% url 'enseignant_cours' %}" class="nav-item {% if 'enseignant' in request.resolver_match.url_name %}active{% endif %}">Enseignant</a>

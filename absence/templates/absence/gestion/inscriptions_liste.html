@@ -6,9 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="card card-muted" style="margin-bottom: 1.25rem;">
-    <p class="small"><strong>Pourquoi le prof ne voit qu’un étudiant ?</strong> La liste « Étudiant » lors d’une absence correspond aux lignes de ce tableau : une ligne = un étudiant <strong>inscrit</strong> à un cours pour une année. Chaque nouvel étudiant doit avoir sa propre <a href="{% url 'gestion_inscription_nouvelle' %}">inscription</a> (même cours BD501, même année que celle du prof).</p>
-</div>
+<p class="small text-muted" style="margin-bottom: 1rem;">Chaque ligne correspond à une <strong>inscription</strong> (étudiant, cours, année). Pour ajouter un étudiant à un cours : <a href="{% url 'gestion_inscription_nouvelle' %}">Nouvelle inscription</a>.</p>
 
 <form method="get" class="stack-form" style="max-width: 360px; margin-bottom: 1rem;">
     <label for="filtre-cours">Filtrer par cours</label>
